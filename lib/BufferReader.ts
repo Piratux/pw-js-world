@@ -100,7 +100,7 @@ export default class BufferReader {
     public static Int16(value: number = 0): Buffer {
         const buffer = BufferReader.alloc(3);
         buffer.writeUInt8(ComponentTypeHeader.Int16);
-        buffer.writeUInt16LE(value);
+        buffer.writeUInt16BE(value);
         return buffer.toBuffer();
     }
 
@@ -111,7 +111,7 @@ export default class BufferReader {
     public static Int32(value: number = 0): Buffer {
         const buffer = BufferReader.alloc(5);
         buffer.writeUInt8(ComponentTypeHeader.Int32);
-        buffer.writeInt32LE(value);
+        buffer.writeInt32BE(value);
         return buffer.toBuffer();
     }
 
@@ -122,7 +122,7 @@ export default class BufferReader {
     public static Int64(value: bigint = BigInt(0).valueOf()): Buffer {
         const buffer = BufferReader.alloc(9);
         buffer.writeUInt8(ComponentTypeHeader.Int64);
-        buffer.writeBigInt64LE(value);
+        buffer.writeBigInt64BE(value);
         return buffer.toBuffer();
     }
 
@@ -164,19 +164,11 @@ export default class BufferReader {
      * @returns {Buffer}
      */
     public static ByteArray(buffer: Buffer = Buffer.from([0])): Buffer {
-        // const bufferByteLen = Buffer.byteLength(buffer);
+        const bufferLength = Buffer.byteLength(buffer);
 
-        // const bufLength = Buffer.alloc(length7BitInt(bufferByteLen));
-        // write7BitInt(bufLength, bufferByteLen, 0);
-
-        // return Buffer.concat([Buffer.from([8]), bufLength, buffer]);
-
-        const stringByteLen = Buffer.byteLength(buffer);
-        const lengthByteCount = this.length7BitInt(stringByteLen);
-
-        const prefix = BufferReader.alloc(1 + lengthByteCount);
-        prefix.writeUInt8(ComponentTypeHeader.String);
-        prefix.write7BitInt(lengthByteCount);
+        const prefix = BufferReader.alloc(2);
+        prefix.writeUInt8(ComponentTypeHeader.ByteArray);
+        prefix.writeUInt8(bufferLength);
 
         return Buffer.concat([prefix.toBuffer(), buffer]);
     }
