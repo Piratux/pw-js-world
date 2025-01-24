@@ -10,7 +10,6 @@ Player = Player.default;
 
 if ("default" in PWGameWorldHelper) PWGameWorldHelper = PWGameWorldHelper.default;
 if ("default" in Block) Block = Block.default;
-if ("default" in BufferReader) BufferReader = BufferReader.default;
 if ("default" in Player) Player = Player.default;
 
 const Constants = (await import("./dist/Constants.js")).default;
