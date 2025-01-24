@@ -14,7 +14,7 @@ if ("default" in Block) Block = Block.default;
 if ("default" in BufferReader) BufferReader = BufferReader.default;
 if ("default" in Player) Player = Player.default;
 
-import * as Constants from "./dist/Constants.js";
+const Constants = (await import("./dist/Constants.js")).default;
 import {ComponentTypeHeader} from "./dist/BufferReader.js";
 
 export default {
