@@ -14,17 +14,17 @@ if ("default" in Block) Block = Block.default;
 if ("default" in BufferReader) BufferReader = BufferReader.default;
 if ("default" in Player) Player = Player.default;
 
-import {LayerType} from "./dist/Constants.js";
+import * as Constants from "./dist/Constants.js";
 import {ComponentTypeHeader} from "./dist/BufferReader.js";
 
 export default {
     PWGameWorldHelper, Block, BufferReader,
-    Player, LayerType, ComponentTypeHeader,
+    Player, Constants, ComponentTypeHeader,
     PlayerEffect
 };
 
 export {
     PWGameWorldHelper, Block, BufferReader,
-    Player, LayerType, ComponentTypeHeader,
+    Player, Constants, ComponentTypeHeader,
     PlayerEffect
 };
