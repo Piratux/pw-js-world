@@ -11,3 +11,9 @@ export default {
     Player, LayerType, ComponentTypeHeader,
     PlayerEffect
 }
+
+export {
+    PWGameWorldHelper, Block, BufferReader,
+    Player, LayerType, ComponentTypeHeader,
+    PlayerEffect
+}
