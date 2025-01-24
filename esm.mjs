@@ -1,7 +1,11 @@
 // TODO: clean this code to make it easier to get named exports.
 let PWGameWorldHelper = (await import("./dist/Helper.js")).default;
 let Block = (await import("./dist/Block.js")).default;
-let BufferReader = (await import("./dist/BufferReader.js")).default;
+let BufferReader = (await import("./dist/BufferReader.js"));
+
+let ComponentTypeHeader = BufferReader.ComponentTypeHeader;
+
+BufferReader = BufferReader.default;
 
 let Player = (await import("./dist/Player.js"));
 
@@ -15,7 +19,6 @@ if ("default" in BufferReader) BufferReader = BufferReader.default;
 if ("default" in Player) Player = Player.default;
 
 const Constants = (await import("./dist/Constants.js")).default;
-import {ComponentTypeHeader} from "./dist/BufferReader.js";
 
 export default {
     PWGameWorldHelper, Block, BufferReader,
