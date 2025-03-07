@@ -1,11 +1,13 @@
-import { BlockNames, type CustomBotEvents, Hook } from "pw-js-api";
+import { PWApiClient, type CustomBotEvents, type Hook } from "pw-js-api";
 import type { ProtoGen } from "pw-js-api";//"../node_modules/pw-js-api/dist/gen/world_pb";
 
-import Block from "./Block";
-import BufferReader from "./BufferReader";
-import Player, { PlayerEffect } from "./Player";
-import { LayerType } from "./Constants";
-import type { BlockArg, Point, PWGameHook, SendableBlockPacket } from "./types";
+import Block from "./Block.js";
+import BufferReader from "./BufferReader.js";
+import Player, { PlayerCounters, PlayerEffect } from "./Player.js";
+import { LayerType } from "./Constants.js";
+import type { BlockArg, Point, PWGameHook, SendableBlockPacket } from "./types/index.js";
+import { DeserialisedStructure } from "./Structure.js";
+import { MissingBlockError } from "./util/Error.js";
 
 /**
  * To use this helper, you must first create an instance of this,
@@ -142,7 +144,7 @@ export default class PWGameWorldHelper {
                     const oldBlocks:Block[] = [];
                     const newBlocks:Block[] = [];
 
-                    const args = Block.deserializeArgs(blockId, BufferReader.from(extraFields), true);
+                    const args = Block.deserializeArgs(BufferReader.from(extraFields));//(blockId, BufferReader.from(extraFields), true);
 
                     for (let i = 0, len = positions.length; i < len; i++) {
                         const { x, y } = positions[i];
@@ -164,8 +166,8 @@ export default class PWGameWorldHelper {
                     let player: Player;
 
                     if (properties && worldState) {
-                        this.players.set(properties.playerId, player = new Player(properties, { ...worldState, switches: this.convertSwitchState(worldState.switches) }));
-                        
+                        this.players.set(properties.playerId, player = new Player(properties, { ...worldState, switches: this.convertSwitchState(worldState.switches), counters: new PlayerCounters(worldState.counters) }));
+
                         return { player };
                     }
                 }
@@ -407,9 +409,11 @@ export default class PWGameWorldHelper {
                     const player = this.players.get(packet.value.playerId as number);
 
                     if (player && packet.value.position) {
-                        const blockName = BlockNames[packet.value.blockId];
+                        const blockName = PWApiClient.listBlocks?.[packet.value.blockId];
 
-                        if (blockName === "COIN_GOLD" || blockName === "COIN_BLUE") {
+                        if (blockName === undefined) throw new MissingBlockError("Current block data might be outdated, restart application?", packet.value.blockId);
+
+                        if (blockName.PaletteId === "COIN_GOLD" || blockName.PaletteId === "COIN_BLUE") {
                             player.states.collectedItems.push({
                                 x: packet.value.position.x,
                                 y: packet.value.position.y,
@@ -418,6 +422,20 @@ export default class PWGameWorldHelper {
                     }
 
                     return player ? { player } : {};
+                }
+            case "playerCounterTransactionPacket":
+                {
+                    const player = this.players.get(packet.value.playerId as number);
+
+                    if (player) {
+                        const oldScore = player.states.counters.scores[packet.value.counterId];
+
+                        player.states.counters.scores[packet.value.counterId] = packet.value.count;
+
+                        return { oldScore, diff: packet.value.count - oldScore, player };
+                    }
+
+                    return {};
                 }
             //#endregion
         }
@@ -566,28 +584,28 @@ export default class PWGameWorldHelper {
     }
 
     /**
-     * For now this is slightly limited, but this will ONLY create a sendable packet which you must then send it yourself.
+     * This will return a DeserialisedStructure which will allow you to easily save to a file if you wish.
+     * 
+     * The blocks are cloned and thus you're free to modify the blocks in the structure without the risk of it affecting this helper's blocks.
+     * 
+     * NOTE: endX and endY are also included!
      */
-    createBlockPacket(blockId: number | BlockNames | keyof typeof BlockNames, layer: LayerType, pos: Point | Point[], ...args: BlockArg[]) : SendableBlockPacket;
-    createBlockPacket(block: Block, layer: LayerType, pos: Point | Point[]) : SendableBlockPacket;
-    createBlockPacket(blockId: number | BlockNames | keyof typeof BlockNames | Block, layer: LayerType, pos: Point | Point[], ...args: BlockArg[]) {
-        if (blockId instanceof Block) {
-            args = blockId.args;
-            blockId = blockId.bId
+    sectionBlocks(startX: number, startY: number, endX: number, endY: number) {
+        const blocks: [Block[][], Block[][]] = [[], []];
+
+        if (startX > endX) throw Error("Starting X is greater than ending X");
+        if (startY > endY) throw Error("Starting Y is greater than ending Y");
+
+        for (let l = 0; l < 2; l++) {
+            for (let x = startX, width = Math.min(endX, this.width); x <= width; x++) {
+                blocks[l][x - startX] = [];
+
+                for (let y = startY, height = Math.min(endY, this.height); y <= height; y++) {
+                    blocks[l][x - startX][y - startY] = this.blocks[l][x][y].clone();
+                }
+            }
         }
-        else if (typeof blockId !== "number") blockId = BlockNames[blockId];
 
-        if (blockId === undefined) throw Error("Unknown block ID");
-        if (layer === undefined || layer < 0 || layer > 1) throw Error("Unknown layer type");
-
-        if (!Array.isArray(pos)) pos = [pos];
-
-        return {
-            isFillOperation: false,
-            blockId,
-            layer,
-            positions: pos,
-            extraFields: Block.serializeArgs(blockId, args, { endian: "big", writeId: false, readTypeByte: true })
-        } satisfies SendableBlockPacket;
+        return new DeserialisedStructure(blocks, { width: endX - startX + 1, height: endY - startY + 1 });
     }
 }

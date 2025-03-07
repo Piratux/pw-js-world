@@ -1,7 +1,7 @@
 // I cba so all of the typings will go here
 
-import Block from "../Block";
-import Player, { IPlayerEffect, IPlayerRights } from "../Player";
+import Block from "../Block.js";
+import Player, { IPlayerEffect, IPlayerRights } from "../Player.js";
 
 type Point = { x: number, y: number };
 
@@ -46,4 +46,5 @@ export type PWGameHook = {
     playerChatPacket: { player: Player },
     playerDirectMessagePacket: { player: Player },
     playerTouchBlockPacket: { player: Player },
+    playerCounterTransactionPacket: { player: Player, oldScore: number, diff: number }
 };
