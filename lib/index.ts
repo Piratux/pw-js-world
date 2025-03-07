@@ -7,6 +7,8 @@ export { default as Block, BlockArgsHeadings } from "./Block.js";
 
 export { default as Player, PlayerEffect, PlayerCounters, type IPlayer, type IPlayerEffect, type IPlayerRights, type IPlayerWorldState } from "./Player.js";
 
+export {DeserialisedStructure, type IStructure} from "./Structure.js";
+
 export { createBlockPacket, createBlockPackets } from "./util/Misc.js";
 export * as Util from "./util/Misc.js";
 
