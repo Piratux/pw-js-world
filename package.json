@@ -10,12 +10,10 @@
   },
   "exports": {
     ".": {
-      "types": "./esm/index.js",
+      "types": "./esm/types/index.d.ts",
       "import": "./esm/index.js",
       "require": "./cm/index.js"
-    },
-    "./*": null,
-    "./esm": null
+    }
   },
   "keywords": [
     "PixelWalker",
