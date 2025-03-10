@@ -10,9 +10,15 @@
   },
   "exports": {
     ".": {
-      "types": "./esm/types/index.d.ts",
-      "import": "./esm/index.js",
-      "require": "./cm/index.js"
+      "source": "./lib/index.ts",
+      "import": {
+        "types": "./esm/types/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./cm/types/index.d.ts",
+        "default": "./cm/index.js"
+      }
     }
   },
   "keywords": [
