@@ -9,9 +9,11 @@
     "prepare": "npm run build"
   },
   "exports": {
-    "types": "./esm/index.js",
-    "import": "./esm/index.js",
-    "require": "./cm/index.js"
+    ".": {
+      "types": "./esm/index.js",
+      "import": "./esm/index.js",
+      "require": "./cm/index.js"
+    }
   },
   "keywords": [
     "PixelWalker",
