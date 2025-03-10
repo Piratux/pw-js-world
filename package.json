@@ -14,7 +14,8 @@
       "import": "./esm/index.js",
       "require": "./cm/index.js"
     },
-    "./*": null
+    "./*": null,
+    "./esm": null
   },
   "keywords": [
     "PixelWalker",
