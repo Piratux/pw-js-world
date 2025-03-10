@@ -13,7 +13,8 @@
       "types": "./esm/index.js",
       "import": "./esm/index.js",
       "require": "./cm/index.js"
-    }
+    },
+    "./*": null
   },
   "keywords": [
     "PixelWalker",
