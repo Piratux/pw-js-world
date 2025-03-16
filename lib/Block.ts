@@ -110,7 +110,7 @@ export default class Block {
             buffer.push(idBuffer);
         }
 
-        const blockData:ComponentTypeHeader[] = (BlockArgsHeadings as any)[this.getPaletteIdById(bId)] ?? [];
+        const blockData:ComponentTypeHeader[] = (BlockArgsHeadings as any)[this.name] ?? [];
 
         for (let i = 0, len = blockData.length; i < len; i++) {
             const entry = BufferReader.Dynamic(blockData[i], args[i]);
